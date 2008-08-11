@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Git;
+
+my $repo = Git->repository;
+my ( $fh, $c )
+    = $repo->command_output_pipe(
+    qw( fsck --unreachable --full --no-reflogs ));
+
+my $n = 0;
+while (<$fh>) {
+    chomp;
+    next if !/ commit /;
+    my ($sha1) = /(\w{40})/;
+    my $tag = sprintf( 'lost+found-%04d', $n );
+    $repo->command( 'tag', $tag, $sha1 );
+    print "Tagging $sha1 as $tag\n";
+    $n++;
+}
+$repo->command_close_pipe( $fh, $c );
+
