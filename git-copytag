@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+use 5.006;
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+
+my %option;
+GetOptions( \%option, 'move' ) or pod2usage(2);
+pod2usage("Two parameters required\n") if @ARGV != 2;
+
+# get the tag type
+my $type = `git cat-file -t $ARGV[0]`;
+chomp $type;
+
+# copy the tag under the new name
+if ( $type eq 'tag' ) {    # annotated tag
+    copy_annotated_tag(@ARGV);
+}
+else {                     # simple tag (commit)
+    copy_tag(@ARGV);
+}
+
+# remove the old one if required
+`git tag -d $ARGV[0]` if $option{move};
+
+# helper routines
+sub copy_tag {
+    my ( $old, $new ) = @_;
+    `git tag $new $old`;
+}
+
+sub copy_annotated_tag {
+    my ( $old, $new ) = @_;
+    my $info = get_annotated_tag_info($old);
+
+    # create new tag
+    $ENV{GIT_COMMITTER_NAME}  = $info->{name};
+    $ENV{GIT_COMMITTER_EMAIL} = $info->{email};
+    $ENV{GIT_COMMITTER_DATE}  = $info->{date};
+
+    # git tag uses stripspace on the annotation, so multiple
+    # consecutive empty lines are turned into a single one
+    open my $fh, "| git tag -F- $new $info->{object}";
+    print $fh $info->{body};
+    close $fh;
+}
+
+sub get_annotated_tag_info {
+    my ($tag) = @_;
+    my %info;
+
+    # get tag content
+    @info{qw( header body )} = split /\n\n/, `git cat-file tag $tag`, 2;
+
+    # parse header
+    %info = ( %info, map { ( split / /, $_, 2 ) } split /\n/, $info{header} );
+    $info{tagger} =~ /^(.*) <([^>]*)> (.*?)$/;
+    @info{qw( name email date )} = ( $1, $2, $3 );
+
+    return \%info;
+}
+
+__END__
+
+=head1 NAME
+
+git-copytag - Copy a tag under another name, with annotations
+
+=head1 SYNOPSIS
+
+B<git-copytag> [ --move ] <oldtag> <newtag>
+
+=head1 DESCRIPTION
+
+B<git-copytag> duplicates (or renames) a tag, with all its annotations.
+
+Signed tag will be copied too, 
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
+
+=cut
