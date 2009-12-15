@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+
+# process command-line options
+my %option = (
+    weeks     => 0,
+    days      => 0,
+    hours     => 0,
+    minutes   => 0,
+    seconds   => 0,
+    author    => 0,
+    committer => 0,
+);
+
+GetOptions(
+    \%option,  'committer!', 'author!', 'dry-run!',
+    'weeks=i', 'days=i',     'hours=i', 'minutes=i',
+    'seconds=i',
+) or die;
+
+# by default, translate both
+$option{author} = $option{committer} = 1
+    unless $option{author} || $option{committer};
+
+# translation into seconds
+my $seconds
+    = $option{seconds} + 60
+    * ( $option{minutes} + 60
+        * ( $option{hours} + 24
+            * ( $option{days} + 7 
+                * $option{weeks} )
+          )
+      );
+
+# nothing to do
+exit 0 if ! $seconds;
+
+# generate the shell command
+my $cmd = q{git filter-branch --commit-filter '};
+$cmd .= qq{GIT_${_}_DATE=`echo "\$GIT_${_}_DATE"|perl -pe'\\''s/\\d+/\$&+$seconds/e'\\''`;}
+    for map uc, grep { $option{$_} } qw( author committer );
+$cmd .= q{git commit-tree "$@"' -- };
+$cmd .= join ' ', map {qq{"$_"}} @ARGV;
+
+# print it or run it
+if   ( $option{'dry-run'} ) { print "$cmd\n"; }
+else                        { exec $cmd; }
+
