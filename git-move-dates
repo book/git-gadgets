@@ -18,8 +18,11 @@ my %option = (
 GetOptions(
     \%option,  'committer!', 'author!', 'dry-run!',
     'weeks=i', 'days=i',     'hours=i', 'minutes=i',
-    'seconds=i',
-) or die;
+    'seconds=i', 'help', 'manual',
+) or pod2usage();
+
+pod2usage( -verbose => 1) if $option{help};
+pod2usage( -verbose => 2) if $option{manual};
 
 # by default, translate both
 $option{author} = $option{committer} = 1
@@ -48,4 +51,74 @@ $cmd .= join ' ', map {qq{"$_"}} @ARGV;
 # print it or run it
 if   ( $option{'dry-run'} ) { print "$cmd\n"; }
 else                        { exec $cmd; }
+
+__END__
+
+=head1 NAME
+
+git-move-dates - simple translation of commit dates
+
+=head1 SYNOPSIS
+
+B<git-move-dates> [ B<options> ] [ I<rev-list> ]
+
+=head1 DESCRIPTION
+
+B<git-move-dates> uses B<git filter-branch> to rewrite commits by
+translating their GIT_AUTHOR_DATE and GITy_COMMITER_DATE.
+
+=head2 Command-line options
+
+B<git-move-dates> accepts the following options:
+
+=over 4
+
+=item B<--dry-run>
+
+Print the generated command instead of executing it.
+
+=item B<--author>
+
+Move the GIT_AUTHOR_DATE.
+
+=item B<--committer>
+
+Move the GIT_COMMITTER_DATE.
+
+=item B<--seconds> I<seconds>
+
+=item B<--minutes> I<minutes>
+
+=item B<--hours> I<hours>
+
+=item B<--days> I<days>
+
+=item B<--weeks> I<weeks>
+
+Add an offset of the given unit (positive or negative).
+
+It's possible to combine them with something like:
+
+    git-move-dates --days 1 --hours 1
+
+=item B<--help>
+
+Provide a short help summary.
+
+=item B<--manual>
+
+Show this manual page.
+
+=back
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK), C<< book@cpan.org >>.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
 
