@@ -1,0 +1,27 @@
+Small gadgets for use with git (and that do not fit in an alias)
+
+
+Content
+-------
+
+* git-copytag
+
+    Copy a tag under another name, with annotations
+
+* git-dot
+
+    Small hack to output graphs in the dot format
+    (could actually be an alias)
+
+* git-move-dates
+
+    Simple translation of dates for a given list of commits
+
+* git-mtime
+
+    Set the mtime of all files to their last commit time
+
+* git-tag-lost-commits
+
+    Find "lost" commits and tag them
+
