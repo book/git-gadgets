@@ -4,6 +4,10 @@ Small gadgets for use with git (and that do not fit in an alias)
 Content
 -------
 
+* aliases
+
+    Some useful aliases
+
 * git-copytag
 
     Copy a tag under another name, with annotations

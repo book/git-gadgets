@@ -1,0 +1,10 @@
+#
+# Useful aliases to put in the [alias] section of your ~/.gitconfig
+#
+
+# Usage:
+#     git plush <push args>
+# Description:
+#     push to your origin and github in one go 
+plush = "!f(){ git push origin \"$@\" && git push github \"$@\";};f"
+
