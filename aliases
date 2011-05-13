@@ -15,3 +15,9 @@ plush = "!f(){ git push origin \"$@\" && git push github \"$@\";};f"
 #     appear to have been performed with an offset of n our from now
 ardis = "!f(){ perl -e'@ENV{<GIT_{AUTHO,COMMITTE}R_DATE>}=(~~localtime$^T+3600*shift)x2;exec git,commit,@ARGV' -- \"$@\";};f"
 
+# Usage:
+#     git last <rev-list>
+# Description:
+#     When was the last commit on the optional rev-list?
+#     (in a human-readable format)
+last = log --pretty=%ad -1 --relative-date
