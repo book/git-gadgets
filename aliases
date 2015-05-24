@@ -12,7 +12,7 @@ plush = "!f(){ git push origin \"$@\" && git push github \"$@\";};f"
 #     git ardis <n> <commit args>
 # Description:
 #     a Teeny Tiny Time Machine, the git ardis will make your commit
-#     appear to have been performed with an offset of n our from now
+#     appear to have been performed with an offset of n hours from now
 ardis = "!f(){ perl -e'@ENV{<GIT_{AUTHO,COMMITTE}R_DATE>}=(~~localtime$^T+3600*shift)x2;exec git,commit,@ARGV' -- \"$@\";};f"
 
 # Usage:
