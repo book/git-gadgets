@@ -16,6 +16,12 @@ plush = "!f(){ git push origin \"$@\" && git push github \"$@\";};f"
 ardis = "!f(){ perl -e'@ENV{<GIT_{AUTHO,COMMITTE}R_DATE>}=(~~localtime$^T+3600*shift)x2;exec git,commit,@ARGV' -- \"$@\";};f"
 
 # Usage:
+#     git graph <rev-list>
+# Description:
+#     a nice graph with all the interestings bits, one commit per line
+graph = log --graph --pretty='format:%C(auto)%h %C(cyan)%ad%C(reset)%C(auto)%d %s' --date=short --date-order
+
+# Usage:
 #     git last <rev-list>
 # Description:
 #     When was the last commit on the optional rev-list?
