@@ -22,6 +22,12 @@ ardis = "!f(){ perl -e'@ENV{<GIT_{AUTHO,COMMITTE}R_DATE>}=(~~localtime$^T+3600*s
 graph = log --graph --pretty='format:%C(auto)%h %C(cyan)%ad%C(reset)%C(auto)%d %s' --date=short --date-order
 
 # Usage:
+#     git blead
+# Description:
+#     a graph of just the unpublished stuff (assuming releases use v* tags)
+blead = "!f(){ git graph `git tag -l v* | tail -1`.. ;};f"
+
+# Usage:
 #     git last <rev-list>
 # Description:
 #     When was the last commit on the optional rev-list?
